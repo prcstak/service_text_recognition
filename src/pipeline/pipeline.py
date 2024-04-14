@@ -1,8 +1,15 @@
 import cv2
+import os
 import numpy as np
 from transformers import AutoProcessor, VisionEncoderDecoderModel
+from matplotlib import pyplot as plt
 from PIL import Image
 from autocorrect import Speller
+
+stages_folder_path = "stages"
+hwt_section_img = os.path.join(stages_folder_path , "selection.jpg")
+nolines_img = os.path.join(stages_folder_path , "nolines.jpg")
+words_selected_img = os.path.join(stages_folder_path , "segmentation.jpg")
 
 
 def rotate(img):
@@ -37,18 +44,23 @@ def crop_recomendation_section(image):
 
     x, y, w, h = cv2.boundingRect(cntsSorted[1])
     cropped_image = image[y:y + h, x:x + w]
+
+    cv2.imwrite(hwt_section_img, cropped_image)
     
     return cropped_image
 
 
 def remove_lines(image):
-    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25,1))
+    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15,1))
     temp2 = 255 - cv2.morphologyEx(image, cv2.MORPH_CLOSE, horizontal_kernel)
     result = cv2.add(temp2, image)
 
     vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,25))
     temp2 = 255 - cv2.morphologyEx(image, cv2.MORPH_CLOSE, vertical_kernel)
     result = cv2.add(temp2, result)
+
+    cv2.imwrite(nolines_img, result)
+
     return result
 
 
@@ -141,7 +153,19 @@ def segmentation2(image):
         for index, window in enumerate(dividers):
             word = line[:,window[0]:window[1]]
             words.append(word)
+
+    fig = plt.figure(figsize=(8, 8))
+    columns = 5
+    rows = len(words)//columns+1
+    i = 1
+    for w in words:
+        fig.add_subplot(rows, columns, i)
+        plt.axis('off')
+        plt.imshow(w)
+        i+=1
     
+    plt.savefig(words_selected_img)
+
     return words
 
 

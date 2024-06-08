@@ -5,37 +5,38 @@ from pipeline import process_image
 
 page = """
 <|layout|columns=1 1|
-<|
-
-
-<|{uploaded_img}|file_selector|label= Upload Image|drop_message=Drop here to Upload|extensions=.png,.jpg|>
+<|layout|columns=1 1|
+<|{uploaded_img}|file_selector|label= Загрузить изображение|drop_message=Drop here to Upload|extensions=.png,.jpg|>
 <|part|render={render_button}|
-<|Recognize text|button|class_name=plain|on_action=on_button_action|>
-<|{status_text}|>
+<|Распознать текст|button|class_name=plain|on_action=on_button_action|>
 |>
 |>
 
 <|
-### Text Recognition App
+### 
 |>
 |>
 
 <|layout|columns=1 1|
 <|
 <|part|render={render_uploaded}|
-<|{uploaded_img}|image|width=70%|>
+<|{uploaded_img}|image|width=74%|>
 |>
 <|part|render={render_steges}|
-<|{hwt_section_img}|image|width=70%|>
+<|{hwt_section_img}|image|width=74%|>
 
-<|{nolines_img}|image|width=70%|>
+<|{nolines_img}|image|width=74%|>
 
-<|{words_selected_img}|image|width=70%|>
+<|{words_selected_img}|image|width=74%|>
 |>
 |>
 
-
+<|
+<|
+###<|{status_text}|>
+|>
 <|{result_text}|>
+|>
 |>
 """
 
@@ -55,12 +56,12 @@ status_text = ""
 
 def on_button_action(state):
     notify(state, 'info', f'Process started')
-    state.status_text = "InProgress"
+    state.status_text = "Распознавание запущено"
     result = process_image(state.uploaded_img)
     notify(state, 'success', f'Process completed')
     state.render_steges = True
     state.render_uploaded = False
-    state.status_text = "Completed"
+    state.status_text = "Результат:"
     state.result_text = result
 
 
